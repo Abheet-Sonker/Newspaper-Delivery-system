@@ -18,7 +18,7 @@ def safe_float(value):
         return 0.0
 
 # Streamlit UI
-st.title("Delivery Data Analysis App 📦")
+st.title("Newspaper Delivery System")
 st.write("Upload a CSV file containing delivery data to analyze.")
 
 # File uploader
@@ -29,7 +29,8 @@ if uploaded_file:
     df = pd.read_csv(uploaded_file)
 
     # Ensure necessary columns exist
-    required_columns = {'Delivery Person ID', 'Customer ID', 'Delivery Days', 'Monthly Billing (Estimated)', 'Weekly Billing (Estimated)', 'Individual Cost (Estimated)'}
+    required_columns = {'Delivery Person ID', 'Customer ID', 'Customer Name', 'Delivery Days', 
+                        'Monthly Billing (Estimated)', 'Weekly Billing (Estimated)', 'Individual Cost (Estimated)'}
     if not required_columns.issubset(df.columns):
         st.error("Error: The uploaded CSV file is missing required columns.")
     else:
@@ -38,14 +39,18 @@ if uploaded_file:
         deliveries_per_day = defaultdict(int)
         monthly_deliveries = defaultdict(int)
         weekly_deliveries = defaultdict(int)
-        cost_per_customer = defaultdict(float)
+        cost_per_customer = defaultdict(lambda: {"name": "", "cost": 0.0})
 
         # Process data
         for _, row in df.iterrows():
             delivery_person = row['Delivery Person ID']
             customer_id = row['Customer ID']
+            customer_name = row['Customer Name']
             delivery_days = str(row['Delivery Days'])
             delivery_count = parse_delivery_days(delivery_days)
+
+            # Store customer name
+            cost_per_customer[customer_id]["name"] = customer_name
 
             # Count deliveries per delivery person
             deliveries_per_person[delivery_person] += delivery_count
@@ -59,20 +64,22 @@ if uploaded_file:
             # Calculate costs based on subscription type
             if 'Monthly' in delivery_days:
                 monthly_deliveries[delivery_person] += 1
-                cost_per_customer[customer_id] += safe_float(row.get('Monthly Billing (Estimated)', 0))
+                cost_per_customer[customer_id]["cost"] += safe_float(row.get('Monthly Billing (Estimated)', 0))
             elif 'Weekly' in delivery_days:
                 weekly_deliveries[delivery_person] += 1
-                cost_per_customer[customer_id] += safe_float(row.get('Weekly Billing (Estimated)', 0)) * 4.33
+                cost_per_customer[customer_id]["cost"] += safe_float(row.get('Weekly Billing (Estimated)', 0)) * 4.33
             else:
-                cost_per_customer[customer_id] += safe_float(row.get('Individual Cost (Estimated)', 0)) * delivery_count * 4.33
+                cost_per_customer[customer_id]["cost"] += safe_float(row.get('Individual Cost (Estimated)', 0)) * delivery_count * 4.33
 
         # Convert results to DataFrames for better visualization
         df_deliveries_per_person = pd.DataFrame(list(deliveries_per_person.items()), columns=["Delivery Person ID", "Total Deliveries"])
         df_deliveries_per_day = pd.DataFrame(list(deliveries_per_day.items()), columns=["Day of the Week", "Total Deliveries"])
         df_monthly_deliveries = pd.DataFrame(list(monthly_deliveries.items()), columns=["Delivery Person ID", "Monthly Deliveries"])
         df_weekly_deliveries = pd.DataFrame(list(weekly_deliveries.items()), columns=["Delivery Person ID", "Weekly Deliveries"])
-        df_cost_per_customer = pd.DataFrame(list(cost_per_customer.items()), columns=["Customer ID", "Total Cost ($)"])
-        df_cost_per_customer["Total Cost ($)"] = df_cost_per_customer["Total Cost ($)"].apply(lambda x: f"${x:.2f}")
+        df_cost_per_customer = pd.DataFrame(
+            [{"Customer ID": cid, "Customer Name": data["name"], "Total Cost ($)": f"${data['cost']:.2f}"} 
+             for cid, data in cost_per_customer.items()]
+        )
 
         # Display results
         st.subheader("📊 Deliveries per Delivery Person")
