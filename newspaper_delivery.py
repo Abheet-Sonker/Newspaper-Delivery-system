@@ -94,4 +94,6 @@ if uploaded_file:
         st.download_button(
             "Download Processed Data as CSV",
             df_cost_per_customer.to_csv(index=False).encode("utf-8"),
-            "processed_data_
+            "processed_data.csv",
+            "text/csv",
+        )
