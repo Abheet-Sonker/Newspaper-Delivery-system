@@ -29,7 +29,7 @@ if uploaded_file:
     df = pd.read_csv(uploaded_file)
 
     # Ensure necessary columns exist
-    required_columns = {'Delivery Person ID', 'Customer ID', 'Customer Name', 'Delivery Days', 
+    required_columns = {'Delivery Person ID', 'Customer ID', 'Name', 'Delivery Days', 
                         'Monthly Billing (Estimated)', 'Weekly Billing (Estimated)', 'Individual Cost (Estimated)'}
     if not required_columns.issubset(df.columns):
         st.error("Error: The uploaded CSV file is missing required columns.")
@@ -45,7 +45,7 @@ if uploaded_file:
         for _, row in df.iterrows():
             delivery_person = row['Delivery Person ID']
             customer_id = row['Customer ID']
-            customer_name = row['Customer Name']
+            customer_name = row['Name']
             delivery_days = str(row['Delivery Days'])
             delivery_count = parse_delivery_days(delivery_days)
 
