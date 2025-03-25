@@ -32,16 +32,14 @@ if uploaded_file:
                 deliveries_per_day[day] += 1
 
         # Calculate costs based on subscription type
-        if 'Monthly' in row['Delivery Days']:
-            monthly_deliveries[row['Delivery Person ID']] += 1
-            cost_per_customer[row['Customer ID']] += float(row['Monthly Billing (Estimated)'].strip('$'))
-        elif 'Weekly' in row['Delivery Days']:
-            weekly_deliveries[row['Delivery Person ID']] += 1
-            cost_per_customer[row['Customer ID']] += float(row['Weekly Billing (Estimated)'].strip('$')) * 4.33
+         if 'Monthly' in delivery_days:
+            monthly_deliveries[delivery_person] += 1
+            cost_per_customer[customer_id] += safe_float(row.get('Monthly Billing (Estimated)', '0'))
+        elif 'Weekly' in delivery_days:
+            weekly_deliveries[delivery_person] += 1
+            cost_per_customer[customer_id] += safe_float(row.get('Weekly Billing (Estimated)', '0')) * 4.33
         else:
-            # Assuming the subscription is daily
-            delivery_days_count = parse_delivery_days(row['Delivery Days'])
-            cost_per_customer[row['Customer ID']] += float(row['Individual Cost (Estimated)'].strip('$')) * delivery_days_count * 4.33
+            cost_per_customer[customer_id] += safe_float(row.get('Individual Cost (Estimated)', '0')) * delivery_count * 4.33
 
     # Display results in Streamlit
     st.subheader("Deliveries per Delivery Person")
