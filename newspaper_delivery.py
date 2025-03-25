@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from collections import defaultdict
-from prettytable import PrettyTable
 
 # Define a function to parse delivery days into a countable format
 def parse_delivery_days(delivery_days):
@@ -46,18 +45,18 @@ if uploaded_file:
 
     # Display results in Streamlit
     st.subheader("Deliveries per Delivery Person")
-    st.table(pd.DataFrame(deliveries_per_person.items(), columns=["Delivery Person ID", "Total Deliveries"]))
+    st.dataframe(pd.DataFrame(deliveries_per_person.items(), columns=["Delivery Person ID", "Total Deliveries"]))
 
     st.subheader("Deliveries per Day of the Week")
-    st.table(pd.DataFrame(deliveries_per_day.items(), columns=["Day of the Week", "Total Deliveries"]))
+    st.dataframe(pd.DataFrame(deliveries_per_day.items(), columns=["Day of the Week", "Total Deliveries"]))
 
     st.subheader("Monthly Deliveries per Delivery Person")
-    st.table(pd.DataFrame(monthly_deliveries.items(), columns=["Delivery Person ID", "Monthly Deliveries"]))
+    st.dataframe(pd.DataFrame(monthly_deliveries.items(), columns=["Delivery Person ID", "Monthly Deliveries"]))
 
     st.subheader("Weekly Deliveries per Delivery Person")
-    st.table(pd.DataFrame(weekly_deliveries.items(), columns=["Delivery Person ID", "Weekly Deliveries"]))
+    st.dataframe(pd.DataFrame(weekly_deliveries.items(), columns=["Delivery Person ID", "Weekly Deliveries"]))
 
     st.subheader("Cost per Customer")
     cost_df = pd.DataFrame(cost_per_customer.items(), columns=["Customer ID", "Total Cost ($)"])
     cost_df["Total Cost ($)"] = cost_df["Total Cost ($)"].apply(lambda x: f"{x:.2f}")
-    st.table(cost_df)
+    st.dataframe(cost_df)
