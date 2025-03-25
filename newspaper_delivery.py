@@ -7,7 +7,7 @@ def parse_delivery_days(delivery_days):
     days = delivery_days.strip('"').split(',')
     return len(days)  # Returns the number of delivery days
 
-st.title("Delivery Data Analysis")
+st.title("Newspaper Delivery System")
 
 # File uploader
 uploaded_file = st.file_uploader("Upload CSV File", type=["csv"])
