@@ -1,0 +1,8 @@
+prettytable
+streamlit
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
+collections
